@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jcdg.system.mapper.SmMapper">
+    
+    <resultMap type="Sm" id="SmResult">
+        <result property="id"    column="id"    />
+        <result property="smmc"    column="smmc"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSmVo">
+        select id, smmc, create_time, update_time from t_sm
+    </sql>
+
+    <select id="selectSmList" parameterType="Sm" resultMap="SmResult">
+        <include refid="selectSmVo"/>
+        <where>  
+            <if test="smmc != null  and smmc != ''"> and smmc = #{smmc}</if>
+        </where>
+    </select>
+    
+    <select id="selectSmById" parameterType="Long" resultMap="SmResult">
+        <include refid="selectSmVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSm" parameterType="Sm">
+        insert into t_sm
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="smmc != null">smmc,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="smmc != null">#{smmc},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSm" parameterType="Sm">
+        update t_sm
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="smmc != null">smmc = #{smmc},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSmById" parameterType="Long">
+        delete from t_sm where id = #{id}
+    </delete>
+
+    <delete id="deleteSmByIds" parameterType="String">
+        delete from t_sm where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jcdg.system.mapper.JcCgMapper">
+    
+    <resultMap type="JcCg" id="JcCgResult">
+        <result property="id"    column="id"    />
+        <result property="jcId"    column="jc_id"    />
+        <result property="jcmc"    column="jc_mc"    />
+        <result property="count"    column="count"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="isPay"    column="is_pay"    />
+        <result property="payTime"    column="pay_time"    />
+    </resultMap>
+
+    <sql id="selectJcCgVo">
+        select id, jc_id, count, create_by, create_time, is_pay, pay_time from t_jc_cg
+    </sql>
+
+    <select id="selectJcCgList" parameterType="JcCg" resultMap="JcCgResult">
+        select t.id, t.jc_id, t.count, t.create_by, t.create_time, t.is_pay, t.pay_time, s.jc_mc as jc_mc
+        from t_jc_cg t left join  t_jc s on t.jc_id=s.id
+        <where>  
+            <if test="jcId != null "> and jc_id = #{jcId}</if>
+            <if test="count != null "> and count = #{count}</if>
+            <if test="isPay != null "> and is_pay = #{isPay}</if>
+            <if test="payTime != null "> and pay_time = #{payTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectJcCgById" parameterType="Long" resultMap="JcCgResult">
+        <include refid="selectJcCgVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertJcCg" parameterType="JcCg" useGeneratedKeys="true" keyProperty="id">
+        insert into t_jc_cg
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="jcId != null">jc_id,</if>
+            <if test="count != null">count,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="isPay != null">is_pay,</if>
+            <if test="payTime != null">pay_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="jcId != null">#{jcId},</if>
+            <if test="count != null">#{count},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="isPay != null">#{isPay},</if>
+            <if test="payTime != null">#{payTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateJcCg" parameterType="JcCg">
+        update t_jc_cg
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="jcId != null">jc_id = #{jcId},</if>
+            <if test="count != null">count = #{count},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="isPay != null">is_pay = #{isPay},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteJcCgById" parameterType="Long">
+        delete from t_jc_cg where id = #{id}
+    </delete>
+
+    <delete id="deleteJcCgByIds" parameterType="String">
+        delete from t_jc_cg where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="pay" parameterType="String">
+        update t_jc_cg set is_pay =1, pay_time =sysdate() where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

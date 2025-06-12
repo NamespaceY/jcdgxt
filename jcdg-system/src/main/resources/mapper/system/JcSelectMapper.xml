@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jcdg.system.mapper.JcSelectMapper">
+    
+    <resultMap type="JcSelect" id="JcSelectResult">
+        <result property="id"    column="id"    />
+        <result property="jcId"    column="jc_id"    />
+        <result property="jcmc"    column="jc_mc"    />
+        <result property="img"    column="img"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="auditStatus"    column="audit_status"    />
+        <result property="auditBy"    column="audit_by"    />
+        <result property="auditTime"    column="audit_time"    />
+    </resultMap>
+
+    <sql id="selectJcSelectVo">
+        select id, jc_id, create_by, create_time, audit_status, audit_by, audit_time from t_jc_select
+    </sql>
+
+    <select id="selectJcSelectList" parameterType="JcSelect" resultMap="JcSelectResult">
+        select t.id, t.jc_id, t.create_by, t.create_time, t.audit_status, t.audit_by, t.audit_time, o.jc_mc as jc_mc, o.img as img
+        from t_jc_select t
+        left join t_jc o on o.id=t.jc_id
+        <where>  
+            <if test="jcId != null "> and t.jc_id = #{jcId}</if>
+            <if test="auditStatus != null "> and t.audit_status = #{auditStatus}</if>
+            <if test="auditBy != null  and auditBy != ''"> and t.audit_by = #{auditBy}</if>
+            <if test="auditTime != null "> and t.audit_time = #{auditTime}</if>
+        </where>
+    </select>
+
+    <select id="selectJcSelectById" parameterType="Long" resultMap="JcSelectResult">
+        <include refid="selectJcSelectVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectJcSelectByJcId" parameterType="Long" resultMap="JcSelectResult">
+        <include refid="selectJcSelectVo"/>
+        where jc_id = #{jcId}
+    </select>
+
+    <insert id="insertJcSelect" parameterType="JcSelect">
+        insert into t_jc_select
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="jcId != null">jc_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="auditStatus != null">audit_status,</if>
+            <if test="auditBy != null">audit_by,</if>
+            <if test="auditTime != null">audit_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="jcId != null">#{jcId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="auditStatus != null">#{auditStatus},</if>
+            <if test="auditBy != null">#{auditBy},</if>
+            <if test="auditTime != null">#{auditTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateJcSelect" parameterType="JcSelect">
+        update t_jc_select
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="jcId != null">jc_id = #{jcId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="auditStatus != null">audit_status = #{auditStatus},</if>
+            <if test="auditBy != null">audit_by = #{auditBy},</if>
+            <if test="auditTime != null">audit_time = #{auditTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="auditJcSelect" parameterType="JcSelect">
+        update t_jc_select set audit_status = #{auditStatus}, audit_by = #{auditBy}, audit_time = #{auditTime}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteJcSelectById" parameterType="Long">
+        delete from t_jc_select where id = #{id}
+    </delete>
+
+    <delete id="deleteJcSelectByIds" parameterType="String">
+        delete from t_jc_select where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

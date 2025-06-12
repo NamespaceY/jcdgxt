@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jcdg.system.mapper.JcMapper">
+    
+    <resultMap type="Jc" id="JcResult">
+        <result property="id"    column="id"    />
+        <result property="smmc"    column="sm_mc"    />
+        <result property="smId"    column="sm_id"    />
+        <result property="jcMc"    column="jc_mc"    />
+        <result property="jcJj"    column="jc_jj"    />
+        <result property="img"    column="img"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="auditStatus"    column="audit_status"    />
+        <result property="auditRemark"    column="audit_remark"    />
+    </resultMap>
+
+    <sql id="selectJcVo">
+        select id, sm_id, jc_mc, jc_jj, img, create_by, create_time, update_by, update_time, audit_status, audit_remark from t_jc
+    </sql>
+
+    <select id="selectJcList" parameterType="Jc" resultMap="JcResult">
+        select t.id, t.sm_id, t.jc_mc, t.jc_jj, t.img, t.create_by, t.create_time, t.update_by, t.update_time,
+               t.audit_status, t.audit_remark, s.smmc as sm_mc
+        from t_jc t
+        left join t_sm s on s.id = t.sm_id
+        <where>  
+            <if test="smId != null "> and t.sm_id = #{smId}</if>
+            <if test="jcMc != null  and jcMc != ''"> and t.jc_mc = #{jcMc}</if>
+            <if test="jcJj != null  and jcJj != ''"> and t.jc_jj = #{jcJj}</if>
+            <if test="img != null  and img != ''"> and t.img = #{img}</if>
+            <if test="auditStatus != null  and auditStatus != ''"> and t.audit_status = #{auditStatus}</if>
+
+        </where>
+    </select>
+    
+    <select id="selectJcById" parameterType="Long" resultMap="JcResult">
+        <include refid="selectJcVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertJc" parameterType="Jc" useGeneratedKeys="true" keyProperty="id">
+        insert into t_jc
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="smId != null">sm_id,</if>
+            <if test="jcMc != null">jc_mc,</if>
+            <if test="jcJj != null">jc_jj,</if>
+            <if test="img != null">img,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="smId != null">#{smId},</if>
+            <if test="jcMc != null">#{jcMc},</if>
+            <if test="jcJj != null">#{jcJj},</if>
+            <if test="img != null">#{img},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateJc" parameterType="Jc">
+        update t_jc
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="smId != null">sm_id = #{smId},</if>
+            <if test="jcMc != null">jc_mc = #{jcMc},</if>
+            <if test="jcJj != null">jc_jj = #{jcJj},</if>
+            <if test="img != null">img = #{img},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="auditJc" parameterType="Jc">
+        update t_jc set audit_status = #{auditStatus}, audit_remark = #{auditRemark} where id = #{id}
+    </update>
+
+    <delete id="deleteJcById" parameterType="Long">
+        delete from t_jc where id = #{id}
+    </delete>
+
+    <delete id="deleteJcByIds" parameterType="String">
+        delete from t_jc where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
